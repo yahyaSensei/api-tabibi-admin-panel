@@ -47,4 +47,11 @@ public class AnalyticsService {
         String sql = "EXEC sp_GetClinicsDistributionByCity";
         return jdbcTemplate.queryForObject(sql, String.class);
     }
+
+    // الدالة دي اللي هترجع الداشبورد كلها في خبطة واحدة لوليد
+    public String getAdminDashboardSummary(String period) {
+        // بنمرر الـ Period للـ Stored Procedure عشان تحسب التواريخ صح
+        String sql = "EXEC sp_GetAdminDashboardSummary @Period = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, period);
+    }
 }

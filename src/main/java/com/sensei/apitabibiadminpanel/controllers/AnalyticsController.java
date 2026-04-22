@@ -64,4 +64,16 @@ public class AnalyticsController {
         // إرجاع مصفوفة الـ JSON مباشرة
         return ResponseEntity.ok(jsonResult);
     }
+
+    // الـ Endpoint المجمعة الخاصة بشاشة الداشبورد الرئيسية
+    @GetMapping(value = "/admin-dashboard", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getAdminDashboard(
+            @RequestParam(value = "period", defaultValue = "monthly") String period) {
+
+        // بننادي على الـ Service ونبعتلها المدة (monthly, weekly, daily, yearly)
+        String jsonResult = analyticsService.getAdminDashboardSummary(period);
+
+        // بنرجع النتيجة المجمعة للـ Frontend
+        return ResponseEntity.ok(jsonResult);
+    }
 }
