@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor // دي بتعمل Constructor تلقائي عشان تحقن الـ JdbcTemplate
 public class AnalyticsService {
@@ -49,11 +51,17 @@ public class AnalyticsService {
     }
 
     // الدالة التي ترجع الداشبورد كلها في خبطة واحدة لتوليد //
-    public String getAdminDashboardSummary(String period) { // البارامتر period لا يزال هنا لأن الكنترولر يرسله
-        // Stored Procedure بدون تمرير البارامتر //
-        String sql = "EXEC sp_GetAdminDashboardSummary"; // مسحنا @Period = ?
+    public String getAdminDashboardSummary() {
+        String sql = "EXEC sp_GetAdminDashboardSummary";
 
-        // استخدام jdbcTemplate.queryForObject بدون تمرير المتغير period
-        return jdbcTemplate.queryForObject(sql, String.class);
+        // 1. استخدم queryForList لاستقبال كافة الصفوف التي يرجعها SQL Server
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class);
+
+        // 2. قم بدمج هذه الصفوف (القطع) لتكوين نص الـ JSON النهائي
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{}"; // أو التعامل مع الحالة فارغة كما تفضل
+        }
+
+        return String.join("", jsonChunks);
     }
 }
