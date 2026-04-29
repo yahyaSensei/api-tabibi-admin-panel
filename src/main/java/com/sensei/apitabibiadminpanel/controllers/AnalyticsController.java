@@ -70,7 +70,7 @@ public class AnalyticsController {
     public ResponseEntity<String> getAdminDashboard() { // إزالة @RequestParam
 
         // المناداة على الـ Service
-        String jsonResult = analyticsService.getAdminDashboardSummary(null); // تمرير null أو يمكنك إزالة البارامتر من الدالة في الـ Service تماماً
+        String jsonResult = analyticsService.getAdminDashboardSummary(); // تمرير null أو يمكنك إزالة البارامتر من الدالة في الـ Service تماماً
 
         // إرجاع النتيجة المجمعة للـ Frontend
         return ResponseEntity.ok(jsonResult);
