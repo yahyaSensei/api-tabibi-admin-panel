@@ -65,15 +65,14 @@ public class AnalyticsController {
         return ResponseEntity.ok(jsonResult);
     }
 
-    // الـ Endpoint المجمعة الخاصة بشاشة الداشبورد الرئيسية
+
     @GetMapping(value = "/admin-dashboard", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> getAdminDashboard(
-            @RequestParam(value = "period", defaultValue = "monthly") String period) {
+    public ResponseEntity<String> getAdminDashboard() { // إزالة @RequestParam
 
-        // بننادي على الـ Service ونبعتلها المدة (monthly, weekly, daily, yearly)
-        String jsonResult = analyticsService.getAdminDashboardSummary(period);
+        // المناداة على الـ Service
+        String jsonResult = analyticsService.getAdminDashboardSummary(null); // تمرير null أو يمكنك إزالة البارامتر من الدالة في الـ Service تماماً
 
-        // بنرجع النتيجة المجمعة للـ Frontend
+        // إرجاع النتيجة المجمعة للـ Frontend
         return ResponseEntity.ok(jsonResult);
     }
 }

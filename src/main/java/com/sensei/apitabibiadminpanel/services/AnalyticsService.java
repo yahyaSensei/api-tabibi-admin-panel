@@ -48,10 +48,12 @@ public class AnalyticsService {
         return jdbcTemplate.queryForObject(sql, String.class);
     }
 
-    // الدالة دي اللي هترجع الداشبورد كلها في خبطة واحدة لوليد
-    public String getAdminDashboardSummary(String period) {
-        // بنمرر الـ Period للـ Stored Procedure عشان تحسب التواريخ صح
-        String sql = "EXEC sp_GetAdminDashboardSummary @Period = ?";
-        return jdbcTemplate.queryForObject(sql, String.class, period);
+    // الدالة التي ترجع الداشبورد كلها في خبطة واحدة لتوليد //
+    public String getAdminDashboardSummary(String period) { // البارامتر period لا يزال هنا لأن الكنترولر يرسله
+        // Stored Procedure بدون تمرير البارامتر //
+        String sql = "EXEC sp_GetAdminDashboardSummary"; // مسحنا @Period = ?
+
+        // استخدام jdbcTemplate.queryForObject بدون تمرير المتغير period
+        return jdbcTemplate.queryForObject(sql, String.class);
     }
 }
