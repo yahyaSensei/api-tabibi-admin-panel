@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,15 +59,32 @@ public class BookingService {
     // ==============================================================================
     // New Methods for Appointments Page
     // ==============================================================================
+// ==============================================================================
+    // New Methods for Appointments Page (Fixed SQL Server JSON Splitting Issue)
+    // ==============================================================================
 
     public String getBookingsPageList(int pageNumber, int pageSize, String searchTerm, Integer statusFilter) {
         String sql = "EXEC sp_GetBookingsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @StatusFilter = ?";
         String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
-        return jdbcTemplate.queryForObject(sql, String.class, pageNumber, pageSize, safeSearchTerm, statusFilter);
+
+        // استخدام queryForList بدل queryForObject لتفادي مشكلة تقسيم الـ JSON
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class, pageNumber, pageSize, safeSearchTerm, statusFilter);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{\"totalCount\": 0, \"pageNumber\": " + pageNumber + ", \"pageSize\": " + pageSize + ", \"data\": []}";
+        }
+        return String.join("", jsonChunks);
     }
 
     public String getBookingsPageDetails(String id) {
         String sql = "EXEC sp_GetBookingsPage_Details @BookingId = ?";
-        return jdbcTemplate.queryForObject(sql, String.class, id);
+
+        // استخدام queryForList هنا برضه احتياطي لو تفاصيل الحجز كانت كبيرة جداً
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class, id);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{}";
+        }
+        return String.join("", jsonChunks);
     }
 }
