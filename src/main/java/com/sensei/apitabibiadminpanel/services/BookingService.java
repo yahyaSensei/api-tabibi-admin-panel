@@ -54,4 +54,19 @@ public class BookingService {
         // تمرير الـ BookingId للـ Procedure
         return jdbcTemplate.queryForObject(sql, String.class, bookingId);
     }
+
+    // ==============================================================================
+    // New Methods for Appointments Page
+    // ==============================================================================
+
+    public String getBookingsPageList(int pageNumber, int pageSize, String searchTerm, Integer statusFilter) {
+        String sql = "EXEC sp_GetBookingsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @StatusFilter = ?";
+        String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
+        return jdbcTemplate.queryForObject(sql, String.class, pageNumber, pageSize, safeSearchTerm, statusFilter);
+    }
+
+    public String getBookingsPageDetails(String id) {
+        String sql = "EXEC sp_GetBookingsPage_Details @BookingId = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, id);
+    }
 }

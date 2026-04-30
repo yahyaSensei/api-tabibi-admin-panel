@@ -102,4 +102,36 @@ public class BookingController {
         // إرجاع 200 OK مع بيانات الروشتة
         return ResponseEntity.ok(jsonResult);
     }
+
+    // ==============================================================================
+    // New Endpoints for Appointments Page
+    // ==============================================================================
+
+    @GetMapping(value = "/page/overview", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getBookingsPageList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "status", required = false) Integer status) {
+
+        String jsonResult = bookingService.getBookingsPageList(page, size, search, status);
+
+        // Remove the extra array brackets added by JSON PATH at the top level of the SP output
+        if(jsonResult != null && jsonResult.startsWith("[") && jsonResult.endsWith("]")) {
+            jsonResult = jsonResult.substring(1, jsonResult.length() - 1);
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
+
+    @GetMapping(value = "/page/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getBookingsPageDetails(@PathVariable("id") String id) {
+        String jsonResult = bookingService.getBookingsPageDetails(id);
+
+        if ("{}".equals(jsonResult) || jsonResult == null || jsonResult.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"Booking details not found\"}");
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
 }
