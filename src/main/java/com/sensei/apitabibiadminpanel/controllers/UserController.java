@@ -131,4 +131,26 @@ public class UserController {
 
         return ResponseEntity.ok(jsonResult);
     }
+
+    // ==============================================================================
+    // Endpoints for Patients Page
+    // ==============================================================================
+    @GetMapping(value = "/patients/page/overview", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getPatientsPageList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "cityId", required = false) String cityId,
+            @RequestParam(value = "sortBy", defaultValue = "CreatedAt") String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = "DESC") String sortOrder) {
+
+        String jsonResult = userService.getPatientsPageList(page, size, search, cityId, sortBy, sortOrder);
+
+        // Remove the extra array brackets added by JSON PATH at the top level of the SP output
+        if(jsonResult != null && jsonResult.startsWith("[") && jsonResult.endsWith("]")) {
+            jsonResult = jsonResult.substring(1, jsonResult.length() - 1);
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
 }

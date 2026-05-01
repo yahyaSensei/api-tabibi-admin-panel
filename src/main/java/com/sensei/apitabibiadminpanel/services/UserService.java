@@ -115,4 +115,26 @@ public class UserService {
         return String.join("", jsonChunks);
     }
 
+    // ==============================================================================
+    // New Methods for Patients Page
+    // ==============================================================================
+    public String getPatientsPageList(int pageNumber, int pageSize, String searchTerm,
+                                      String cityId, String sortBy, String sortOrder) {
+        String sql = "EXEC sp_GetPatientsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @CityId = ?, @SortBy = ?, @SortOrder = ?";
+
+        String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
+        String safeCityId = (cityId != null && !cityId.trim().isEmpty()) ? cityId : null;
+        String safeSortBy = (sortBy != null && !sortBy.trim().isEmpty()) ? sortBy : "CreatedAt";
+        String safeSortOrder = (sortOrder != null && !sortOrder.trim().isEmpty()) ? sortOrder : "DESC";
+
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class,
+                pageNumber, pageSize, safeSearchTerm, safeCityId, safeSortBy, safeSortOrder);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{\"totalCount\": 0, \"pageNumber\": " + pageNumber + ", \"pageSize\": " + pageSize + ", \"data\": []}";
+        }
+
+        return String.join("", jsonChunks);
+    }
+
 }
