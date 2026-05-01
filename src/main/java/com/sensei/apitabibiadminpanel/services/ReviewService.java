@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
@@ -34,5 +36,30 @@ public class ReviewService {
 
         // تمرير الـ ID للـ Procedure
         return jdbcTemplate.queryForObject(sql, String.class, id);
+    }
+
+    // ==============================================================================
+    // New Methods for Reviews Page (Pagination, Filter, Search, Sort)
+    // ==============================================================================
+    public String getReviewsPageList(int pageNumber, int pageSize, String searchTerm,
+                                     String doctorId, String patientId,
+                                     String sortBy, String sortOrder) {
+
+        String sql = "EXEC sp_GetReviewsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @DoctorId = ?, @PatientId = ?, @SortBy = ?, @SortOrder = ?";
+
+        String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
+        String safeDoctorId = (doctorId != null && !doctorId.trim().isEmpty()) ? doctorId : null;
+        String safePatientId = (patientId != null && !patientId.trim().isEmpty()) ? patientId : null;
+        String safeSortBy = (sortBy != null && !sortBy.trim().isEmpty()) ? sortBy : "CreatedAt";
+        String safeSortOrder = (sortOrder != null && !sortOrder.trim().isEmpty()) ? sortOrder : "DESC";
+
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class,
+                pageNumber, pageSize, safeSearchTerm, safeDoctorId, safePatientId, safeSortBy, safeSortOrder);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{\"totalCount\": 0, \"pageNumber\": " + pageNumber + ", \"pageSize\": " + pageSize + ", \"data\": []}";
+        }
+
+        return String.join("", jsonChunks);
     }
 }

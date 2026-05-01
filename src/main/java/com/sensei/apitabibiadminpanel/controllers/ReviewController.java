@@ -56,4 +56,27 @@ public class ReviewController {
         // إرجاع 200 OK مع رسالة التأكيد
         return ResponseEntity.ok(jsonResult);
     }
+
+    // ==============================================================================
+    // Endpoints for Reviews Overview
+    // ==============================================================================
+    @GetMapping(value = "/page/overview", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getReviewsPageList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "doctorId", required = false) String doctorId,
+            @RequestParam(value = "patientId", required = false) String patientId,
+            @RequestParam(value = "sortBy", defaultValue = "CreatedAt") String sortBy,
+            @RequestParam(value = "sortOrder", defaultValue = "DESC") String sortOrder) {
+
+        String jsonResult = reviewService.getReviewsPageList(page, size, search, doctorId, patientId, sortBy, sortOrder);
+
+        // Remove the extra array brackets added by JSON PATH at the top level of the SP output
+        if(jsonResult != null && jsonResult.startsWith("[") && jsonResult.endsWith("]")) {
+            jsonResult = jsonResult.substring(1, jsonResult.length() - 1);
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
 }
