@@ -137,4 +137,14 @@ public class UserService {
         return String.join("", jsonChunks);
     }
 
+    public String getPatientPageDetails(String id) {
+        String sql = "EXEC sp_GetPatientPage_Details @PatientId = ?";
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class, id);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{}";
+        }
+        return String.join("", jsonChunks);
+    }
+
 }
