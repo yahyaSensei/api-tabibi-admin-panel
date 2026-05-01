@@ -134,4 +134,31 @@ public class BookingController {
 
         return ResponseEntity.ok(jsonResult);
     }
+    // ==============================================================================
+    // Endpoints for Appointments Page
+    // ==============================================================================
+
+    @GetMapping(value = "/page/overview", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getBookingsPageList(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "status", required = false) Integer status,
+            @RequestParam(value = "type", required = false) Integer type,
+            @RequestParam(value = "startDate", required = false) String startDate,
+            @RequestParam(value = "endDate", required = false) String endDate) {
+
+        // تنظيف التواريخ لو مبعوتة فاضية بدل ما تضرب Error في الـ SQL
+        String finalStartDate = (startDate != null && !startDate.trim().isEmpty()) ? startDate : null;
+        String finalEndDate = (endDate != null && !endDate.trim().isEmpty()) ? endDate : null;
+
+        String jsonResult = bookingService.getBookingsPageList(page, size, search, status, type, finalStartDate, finalEndDate);
+
+        // Remove the extra array brackets added by JSON PATH at the top level of the SP output
+        if(jsonResult != null && jsonResult.startsWith("[") && jsonResult.endsWith("]")) {
+            jsonResult = jsonResult.substring(1, jsonResult.length() - 1);
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
 }

@@ -87,4 +87,26 @@ public class BookingService {
         }
         return String.join("", jsonChunks);
     }
+
+    // ==============================================================================
+    // Methods for Appointments Page
+    // ==============================================================================
+
+    public String getBookingsPageList(int pageNumber, int pageSize, String searchTerm,
+                                      Integer statusFilter, Integer typeFilter,
+                                      String startDate, String endDate) {
+
+        String sql = "EXEC sp_GetBookingsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @StatusFilter = ?, @TypeFilter = ?, @StartDate = ?, @EndDate = ?";
+
+        String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
+
+        // استخدام queryForList بدل queryForObject لتفادي مشكلة تقسيم الـ JSON اللي حليناها المرة اللي فاتت
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class,
+                pageNumber, pageSize, safeSearchTerm, statusFilter, typeFilter, startDate, endDate);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{\"totalCount\": 0, \"pageNumber\": " + pageNumber + ", \"pageSize\": " + pageSize + ", \"data\": []}";
+        }
+        return String.join("", jsonChunks);
+    }
 }
