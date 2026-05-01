@@ -120,4 +120,15 @@ public class UserController {
 
         return ResponseEntity.ok(jsonResult);
     }
+
+    @GetMapping(value = "/doctors/page/details/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<String> getDoctorPageDetails(@PathVariable("id") String id) {
+        String jsonResult = userService.getDoctorPageDetails(id);
+
+        if ("{}".equals(jsonResult) || jsonResult == null || jsonResult.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"message\": \"Doctor details not found\"}");
+        }
+
+        return ResponseEntity.ok(jsonResult);
+    }
 }

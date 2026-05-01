@@ -105,4 +105,14 @@ public class UserService {
         return String.join("", jsonChunks);
     }
 
+    public String getDoctorPageDetails(String id) {
+        String sql = "EXEC sp_GetDoctorPage_Details @DoctorId = ?";
+        List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class, id);
+
+        if (jsonChunks == null || jsonChunks.isEmpty()) {
+            return "{}";
+        }
+        return String.join("", jsonChunks);
+    }
+
 }
