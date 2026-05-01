@@ -94,19 +94,20 @@ public class BookingService {
 
     public String getBookingsPageList(int pageNumber, int pageSize, String searchTerm,
                                       Integer statusFilter, Integer typeFilter,
-                                      String startDate, String endDate) {
-
-        String sql = "EXEC sp_GetBookingsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @StatusFilter = ?, @TypeFilter = ?, @StartDate = ?, @EndDate = ?";
+                                      String startDate, String endDate,
+                                      String patientId, String doctorId) {
+        String sql = "EXEC sp_GetBookingsPage_List @PageNumber = ?, @PageSize = ?, @SearchTerm = ?, @StatusFilter = ?, @TypeFilter = ?, @StartDate = ?, @EndDate = ?, @PatientId = ?, @DoctorId = ?";
 
         String safeSearchTerm = (searchTerm != null) ? searchTerm : "";
 
-        // استخدام queryForList بدل queryForObject لتفادي مشكلة تقسيم الـ JSON اللي حليناها المرة اللي فاتت
+        // queryForList للتعامل مع الـ JSON المقسم من SQL
         List<String> jsonChunks = jdbcTemplate.queryForList(sql, String.class,
-                pageNumber, pageSize, safeSearchTerm, statusFilter, typeFilter, startDate, endDate);
+                pageNumber, pageSize, safeSearchTerm, statusFilter, typeFilter, startDate, endDate, patientId, doctorId);
 
         if (jsonChunks == null || jsonChunks.isEmpty()) {
             return "{\"totalCount\": 0, \"pageNumber\": " + pageNumber + ", \"pageSize\": " + pageSize + ", \"data\": []}";
         }
+
         return String.join("", jsonChunks);
     }
 }

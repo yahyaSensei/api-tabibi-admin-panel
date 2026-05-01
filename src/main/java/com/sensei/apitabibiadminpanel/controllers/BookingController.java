@@ -78,13 +78,17 @@ public class BookingController {
             @RequestParam(value = "status", required = false) Integer status,
             @RequestParam(value = "type", required = false) Integer type,
             @RequestParam(value = "startDate", required = false) String startDate,
-            @RequestParam(value = "endDate", required = false) String endDate) {
+            @RequestParam(value = "endDate", required = false) String endDate,
+            @RequestParam(value = "patientId", required = false) String patientId,
+            @RequestParam(value = "doctorId", required = false) String doctorId) {
 
-        // تنظيف التواريخ لو مبعوتة فاضية بدل ما تضرب Error في الـ SQL
+        // Error handling & null checks
         String finalStartDate = (startDate != null && !startDate.trim().isEmpty()) ? startDate : null;
         String finalEndDate = (endDate != null && !endDate.trim().isEmpty()) ? endDate : null;
+        String finalPatientId = (patientId != null && !patientId.trim().isEmpty()) ? patientId : null;
+        String finalDoctorId = (doctorId != null && !doctorId.trim().isEmpty()) ? doctorId : null;
 
-        String jsonResult = bookingService.getBookingsPageList(page, size, search, status, type, finalStartDate, finalEndDate);
+        String jsonResult = bookingService.getBookingsPageList(page, size, search, status, type, finalStartDate, finalEndDate, finalPatientId, finalDoctorId);
 
         // Remove the extra array brackets added by JSON PATH at the top level of the SP output
         if(jsonResult != null && jsonResult.startsWith("[") && jsonResult.endsWith("]")) {
